@@ -127,9 +127,11 @@ function App() {
     /////////////   THE FINDER CONTAINER   /////////////
     return (
       <div>
+        <center>
         <br />
         <h1>{message}</h1><br /><br />
         <button onClick={findMatch}>Find</button>
+        </center>
       </div>
     );
     /////////////  THE FINDER CONTAINER   /////////////
@@ -140,7 +142,8 @@ function App() {
     return (
       <div>
         <HuddleClientProvider value={huddleClient}>
-          
+          <center>
+          Room ID : {roomID}
           <div className="">
             <div className="">
               <MeVideoElem />
@@ -169,6 +172,7 @@ function App() {
               Exit
             </button>
           </div>
+          </center>
         </HuddleClientProvider>
       </div>
     );
@@ -269,8 +273,10 @@ function App() {
   return (
     <>
       <div>
+      <center>
         {!currentAccount && renderNotConnectedContainer()}
         {currentAccount && renderConnectedContainer()}
+      </center>
       </div>
     </>
   );
