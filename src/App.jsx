@@ -1,7 +1,7 @@
 import reactLogo from "./assets/react.svg";
-import "./App.css";
+// import "./App.css";
 import React, { useEffect, useState } from "react";
-import { doc, setDoc, getDocs,updateDoc, collection, query, where, limit, onSnapshot } from "firebase/firestore";
+import { doc, setDoc, getDocs, updateDoc, collection, query, where, limit, onSnapshot } from "firebase/firestore";
 import { myDatabase } from "./firebaseInit"
 import { networks } from './utils/networks';
 
@@ -21,6 +21,7 @@ function App() {
   const roomState = useHuddleStore((state) => state.roomState);
   const recordingState = useHuddleStore((state) => state.recordingState);
   const recordings = useHuddleStore((state) => state.recordings);
+  const [message, setMessage] = useState('');
 
 
   const [currentAccount, setCurrentAccount] = useState('');
@@ -111,51 +112,49 @@ function App() {
     }
   }
 
-    // Render Methods
-    const renderNotConnectedContainer = () => (<>
-      <center>
-        <div className="text-6xl pt-32">
-          <button onClick={connectWallet} className="rounded-lg bg-yellow-400 hover:opacity-75 p-8">
-            Connect Wallet
-          </button>
-        </div>
-      </center>
-    </>
-    );
-    const renderFinderContainer = () => {
-      /////////////   THE FINDER CONTAINER   /////////////
-      return (
-        <div>
-          <button onClick={findMatch}>Find</button>
-        </div>
-      );
-      /////////////  THE FINDER CONTAINER   /////////////
-    }
-  
-    const renderMeetContainer = () => {
-      /////////////   THE MEET CONTAINER   /////////////
-      return (
-        <div>
-          <HuddleClientProvider value={huddleClient}>
-      <h2 className={`text-${!roomState.joined ? "red" : "green"}`}>
-            o
-          </h2>
-
-          
-      <div className="">
-        <div className = "">
-          <MeVideoElem />
-        </div>
-
-        <div className = "">
-            <div className="">
-            {peersKeys.map((key) => (
-              <PeerVideoAudioElem key={`peerId-${key}`} peerIdAtIndex={key} />
-            ))}
-          </div>
-        </div>
+  // Render Methods
+  const renderNotConnectedContainer = () => (<>
+    <center>
+      <div className="text-6xl pt-32">
+        <button onClick={connectWallet} className="rounded-lg bg-yellow-400 hover:opacity-75 p-8">
+          Connect Wallet
+        </button>
       </div>
-      <div className="">
+    </center>
+  </>
+  );
+  const renderFinderContainer = () => {
+    /////////////   THE FINDER CONTAINER   /////////////
+    return (
+      <div>
+        <br />
+        <h1>{message}</h1><br /><br />
+        <button onClick={findMatch}>Find</button>
+      </div>
+    );
+    /////////////  THE FINDER CONTAINER   /////////////
+  }
+
+  const renderMeetContainer = () => {
+    /////////////   THE MEET CONTAINER   /////////////
+    return (
+      <div>
+        <HuddleClientProvider value={huddleClient}>
+          
+          <div className="">
+            <div className="">
+              <MeVideoElem />
+            </div>
+
+            <div className="">
+              <div className="">
+                {peersKeys.map((key) => (
+                  <PeerVideoAudioElem key={`peerId-${key}`} peerIdAtIndex={key} />
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="">
             <button onClick={handleJoin}>Join Room</button>
             <button onClick={() => huddleClient.enableWebcam()}>
               Enable Webcam
@@ -163,87 +162,100 @@ function App() {
             <button onClick={() => huddleClient.disableWebcam()}>
               Disable Webcam
             </button>
-            <button onClick={() => huddleClient.allowAllLobbyPeersToJoinRoom()}>
+            {/* <button onClick={() => huddleClient.allowAllLobbyPeersToJoinRoom()}>
               allowAllLobbyPeersToJoinRoom()
+            </button> */}
+            <button onClick={() => setStatus(false) }>
+              Exit
             </button>
           </div>
-    </HuddleClientProvider>
-        </div>
+        </HuddleClientProvider>
+      </div>
+    );
+    /////////////  THE MEET CONTAINER   /////////////
+  }
+  const renderConnectedContainer = () => {
+    if (network !== 'Polygon Mumbai Testnet') {
+      return (<>
+        <center>
+          <div className="text-6xl pt-32">
+            <h2>Please switch to Polygon Mumbai Testnet</h2>
+            <br />
+            <button className='rounded-lg bg-yellow-400 hover:opacity-75 p-8' onClick={switchNetwork}>Click here to switch</button>
+          </div>
+        </center>
+      </>
       );
-      /////////////  THE MEET CONTAINER   /////////////
     }
-    const renderConnectedContainer = () => {
-      if (network !== 'Polygon Mumbai Testnet') {
-        return (<>
-          <center>
-            <div className="text-6xl pt-32">
-              <h2>Please switch to Polygon Mumbai Testnet</h2>
-              <br />
-              <button className='rounded-lg bg-yellow-400 hover:opacity-75 p-8' onClick={switchNetwork}>Click here to switch</button>
-            </div>
-          </center>
-        </>
-        );
-      }
-      return (<div >
-        <div>
-          {!status && renderFinderContainer()}
-          { status && renderMeetContainer()}
-        </div>
-      </div>);
-    };
-  
-    useEffect(() => {
-      checkIfWalletIsConnected();
-    }, []);
-  
-    const findMatch = async () => {
-  
-      const q = query(collection(myDatabase, "Users"), where("status", "==", false), limit(1));
-      const querySnapshot = await getDocs(q);
-      if (querySnapshot.size != 0) {
-        querySnapshot.forEach((doc) => {
-          setRoomID(doc.id)
-          console.log(doc.id, " => ", doc.data().status);
-        });
-  
-        console.log("Found Room Match")
-        await updateDoc(doc(myDatabase, "Users", roomID), {
-          status: true
-        });
-        console.log("Set Status to true")
-  
-        setStatus(true)
-  
-        console.log("joined" + roomID)
-      }
-      else {
-        console.log("Not Found")
-        await setDoc(doc(myDatabase, "Users", currentAccount), {
-          type: "punk",
-          status: false
-        });
-  
-        setRoomID(currentAccount);
-        
-        console.log("Created Room")
-  
-        console.log("Waiting for Participant")
-  
-        const unsub = onSnapshot(doc(myDatabase, "Users", currentAccount), (doc) => {
-          console.log("Current data: ", doc.data());
-          if(doc.data().status==true){
-            setStatus(true)
-          }
-        });
-        
-      }
+    return (<div >
+      <div>
+        {!status && renderFinderContainer()}
+        {status && renderMeetContainer()}
+      </div>
+    </div>);
+  };
+
+  useEffect(() => {
+    checkIfWalletIsConnected();
+  }, []);
+
+  const findMatch = async () => {
+
+    const q = query(collection(myDatabase, "Users"), where("status", "==", false), limit(1));
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.size != 0) {
+      querySnapshot.forEach((doc) => {
+        setRoomID(doc.id)
+        console.log(doc.id, " => ", doc.data().status);
+      });
+
+      console.log("Found Room Match")
+
+
+      console.log("Set Status to true")
+
+      await updateDoc(doc(myDatabase, "Users", roomID), {
+        status: true
+      });
+
+      setStatus(true)
+      // huddleClient.enableWebcam()
+      // handleJoin()
+      // huddleClient.allowAllLobbyPeersToJoinRoom()
+      console.log("joined" + roomID)
     }
+    else {
+      console.log("Not Found")
+      await setDoc(doc(myDatabase, "Users", currentAccount), {
+        type: "punk",
+        status: false
+      });
+
+      setRoomID(currentAccount);
+
+      console.log("Created Room")
+
+      console.log("Waiting for Participant")
+
+      const unsub = onSnapshot(doc(myDatabase, "Users", currentAccount), (doc) => {
+        console.log("Current data: ", doc.data());
+        setMessage("waiting for participant to join")
+        if (doc.data().status == true) {
+          setMessage("")
+          setStatus(true)
+          // huddleClient.enableWebcam()
+          // handleJoin()
+          // huddleClient.allowAllLobbyPeersToJoinRoom()
+        }
+      });
+
+    }
+  }
 
   const handleJoin = async () => {
     try {
-      await huddleClient.join("dev", {
-        address: "0x15900c698ee356E6976e5645394F027F0704c8Eb",
+      await huddleClient.join(roomID, {
+        address: currentAccount,
         wallet: "",
         ens: "axit.eth",
       });
@@ -256,12 +268,13 @@ function App() {
 
   return (
     <>
-    <div>
+      <div>
         {!currentAccount && renderNotConnectedContainer()}
         {currentAccount && renderConnectedContainer()}
       </div>
     </>
   );
 }
+
 
 export default App;
