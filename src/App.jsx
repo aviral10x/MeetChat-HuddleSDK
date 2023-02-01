@@ -260,7 +260,7 @@ function App() {
     try {
       await huddleClient.join(roomID, {
         address: currentAccount,
-        wallet: "",
+        wallet: currentAccount,
         ens: "axit.eth",
       });
 
