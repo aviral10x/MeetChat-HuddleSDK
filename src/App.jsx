@@ -152,6 +152,7 @@ function App() {
               <div className="">
                 {peersKeys.map((key) => (
                   <PeerVideoAudioElem key={`peerId-${key}`} peerIdAtIndex={key} />
+
                 ))}
               </div>
             </div>
@@ -202,6 +203,10 @@ function App() {
     checkIfWalletIsConnected();
   }, []);
 
+  // useEffect(() =>{
+  //   console.log({peersKeys})
+  // }, [peersKeys])
+
   const findMatch = async () => {
 
     const q = query(collection(myDatabase, "Users"), where("status", "==", false), limit(1));
@@ -222,21 +227,22 @@ function App() {
       });
 
       setStatus(true)
-      huddleClient.enableWebcam()
+      // huddleClient.enableWebcam()
       handleJoin()
       // huddleClient.allowAllLobbyPeersToJoinRoom()
       console.log("joined" + roomID)
     }
     else {
       console.log("Not Found")
+
       await setDoc(doc(myDatabase, "Users", currentAccount), {
         type: "punk",
         status: false
       });
-
+      
       setRoomID(currentAccount);
 
-      console.log("Created Room")
+      console.log("Created Room" + roomID)
 
       console.log("Waiting for Participant")
 
@@ -247,8 +253,8 @@ function App() {
           setMessage("")
           setStatus(true)
            huddleClient.enableWebcam()
-           handleJoin()
-           huddleClient.allowAllLobbyPeersToJoinRoom()
+          //  handleJoin()
+          //  huddleClient.allowAllLobbyPeersToJoinRoom()
         }
       });
 
