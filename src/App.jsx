@@ -1,5 +1,4 @@
 import reactLogo from "./assets/react.svg";
-// import "./App.css";
 import React, { useEffect, useState } from "react";
 import { doc, setDoc, getDocs, updateDoc, collection, query, where, limit, onSnapshot } from "firebase/firestore";
 import { myDatabase } from "./firebaseInit"
@@ -165,9 +164,9 @@ function App() {
             <button onClick={() => huddleClient.disableWebcam()}>
               Disable Webcam
             </button>
-            {/* <button onClick={() => huddleClient.allowAllLobbyPeersToJoinRoom()}>
+            <button onClick={() => huddleClient.allowAllLobbyPeersToJoinRoom()}>
               allowAllLobbyPeersToJoinRoom()
-            </button> */}
+            </button>
             <button onClick={() => setStatus(false) }>
               Exit
             </button>
@@ -223,8 +222,8 @@ function App() {
       });
 
       setStatus(true)
-      // huddleClient.enableWebcam()
-      // handleJoin()
+      huddleClient.enableWebcam()
+      handleJoin()
       // huddleClient.allowAllLobbyPeersToJoinRoom()
       console.log("joined" + roomID)
     }
@@ -247,9 +246,9 @@ function App() {
         if (doc.data().status == true) {
           setMessage("")
           setStatus(true)
-          // huddleClient.enableWebcam()
-          // handleJoin()
-          // huddleClient.allowAllLobbyPeersToJoinRoom()
+           huddleClient.enableWebcam()
+           handleJoin()
+           huddleClient.allowAllLobbyPeersToJoinRoom()
         }
       });
 
