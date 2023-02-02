@@ -213,8 +213,11 @@ function App() {
     const querySnapshot = await getDocs(q);
     if (querySnapshot.size != 0) {
       querySnapshot.forEach((doc) => {
-        setRoomID(doc.id)
-        console.log(doc.id, " => ", doc.data().status);
+        if(doc.id != currentAccount){
+          setRoomID(doc.id)
+          console.log(doc.id, " => ", doc.data().status);
+        }
+        
       });
 
       console.log("Found Room Match")
