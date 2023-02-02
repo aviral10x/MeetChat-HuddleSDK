@@ -165,9 +165,9 @@ function App() {
             <button onClick={() => huddleClient.disableWebcam()}>
               Disable Webcam
             </button>
-            <button onClick={() => huddleClient.allowAllLobbyPeersToJoinRoom()}>
+            {/* <button onClick={() => huddleClient.allowAllLobbyPeersToJoinRoom()}>
               allowAllLobbyPeersToJoinRoom()
-            </button>
+            </button> */}
             <button onClick={() => setStatus(false) }>
               Exit
             </button>
@@ -213,8 +213,11 @@ function App() {
     const querySnapshot = await getDocs(q);
     if (querySnapshot.size != 0) {
       querySnapshot.forEach((doc) => {
-        setRoomID(doc.id)
-        console.log(doc.id, " => ", doc.data().status);
+        if(doc.id != currentAccount){
+          setRoomID(doc.id)
+          console.log(doc.id, " => ", doc.data().status);
+        }
+        
       });
 
       console.log("Found Room Match")
@@ -229,7 +232,7 @@ function App() {
       setStatus(true)
       // huddleClient.enableWebcam()
       handleJoin()
-      // huddleClient.allowAllLobbyPeersToJoinRoom()
+      huddleClient.allowAllLobbyPeersToJoinRoom()
       console.log("joined" + roomID)
     }
     else {
@@ -254,7 +257,7 @@ function App() {
           setStatus(true)
            huddleClient.enableWebcam()
           //  handleJoin()
-          //  huddleClient.allowAllLobbyPeersToJoinRoom()
+            huddleClient.allowAllLobbyPeersToJoinRoom()
         }
       });
 
