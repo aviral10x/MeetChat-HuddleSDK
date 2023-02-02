@@ -1,5 +1,4 @@
 import reactLogo from "./assets/react.svg";
-// import "./App.css";
 import React, { useEffect, useState } from "react";
 import { doc, setDoc, getDocs, updateDoc, collection, query, where, limit, onSnapshot } from "firebase/firestore";
 import { myDatabase } from "./firebaseInit"
@@ -153,6 +152,7 @@ function App() {
               <div className="">
                 {peersKeys.map((key) => (
                   <PeerVideoAudioElem key={`peerId-${key}`} peerIdAtIndex={key} />
+
                 ))}
               </div>
             </div>
@@ -165,9 +165,9 @@ function App() {
             <button onClick={() => huddleClient.disableWebcam()}>
               Disable Webcam
             </button>
-            {/* <button onClick={() => huddleClient.allowAllLobbyPeersToJoinRoom()}>
+            <button onClick={() => huddleClient.allowAllLobbyPeersToJoinRoom()}>
               allowAllLobbyPeersToJoinRoom()
-            </button> */}
+            </button>
             <button onClick={() => setStatus(false) }>
               Exit
             </button>
@@ -203,6 +203,10 @@ function App() {
     checkIfWalletIsConnected();
   }, []);
 
+  // useEffect(() =>{
+  //   console.log({peersKeys})
+  // }, [peersKeys])
+
   const findMatch = async () => {
 
     const q = query(collection(myDatabase, "Users"), where("status", "==", false), limit(1));
@@ -224,20 +228,21 @@ function App() {
 
       setStatus(true)
       // huddleClient.enableWebcam()
-      // handleJoin()
+      handleJoin()
       // huddleClient.allowAllLobbyPeersToJoinRoom()
       console.log("joined" + roomID)
     }
     else {
       console.log("Not Found")
+
       await setDoc(doc(myDatabase, "Users", currentAccount), {
         type: "punk",
         status: false
       });
-
+      
       setRoomID(currentAccount);
 
-      console.log("Created Room")
+      console.log("Created Room" + roomID)
 
       console.log("Waiting for Participant")
 
@@ -247,9 +252,9 @@ function App() {
         if (doc.data().status == true) {
           setMessage("")
           setStatus(true)
-          // huddleClient.enableWebcam()
-          // handleJoin()
-          // huddleClient.allowAllLobbyPeersToJoinRoom()
+           huddleClient.enableWebcam()
+          //  handleJoin()
+          //  huddleClient.allowAllLobbyPeersToJoinRoom()
         }
       });
 
@@ -260,7 +265,7 @@ function App() {
     try {
       await huddleClient.join(roomID, {
         address: currentAccount,
-        wallet: "",
+        wallet: currentAccount,
         ens: "axit.eth",
       });
 
