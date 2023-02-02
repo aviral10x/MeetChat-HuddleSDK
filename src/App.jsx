@@ -1,4 +1,3 @@
-import reactLogo from "./assets/react.svg";
 import React, { useEffect, useState } from "react";
 import { doc, setDoc, getDocs, updateDoc, collection, query, where, limit, onSnapshot } from "firebase/firestore";
 import { myDatabase } from "./firebaseInit"
@@ -27,6 +26,7 @@ function App() {
   const [network, setNetwork] = useState('');
   const [status, setStatus] = useState(false);
   const [roomID, setRoomID] = useState('');
+  const [isRoomCreated, setRoomCreated] = useState(false);
 
   const connectWallet = async () => {
     try {
@@ -126,12 +126,12 @@ function App() {
     /////////////   THE FINDER CONTAINER   /////////////
     return (
       <div>
-        <center>
-        <br />
-        <h1>{message}</h1><br /><br />
-        <button onClick={findMatch}>Find</button>
-        </center>
-      </div>
+      <center>
+      <br />
+      <h1>{message}</h1><br /><br />
+      <button onClick={findMatch}>Find a Match</button>
+      </center>
+    </div>
     );
     /////////////  THE FINDER CONTAINER   /////////////
   }
@@ -142,36 +142,36 @@ function App() {
       <div>
         <HuddleClientProvider value={huddleClient}>
           <center>
-          Room ID : {roomID}
-          <div className="">
-            <div className="">
-              <MeVideoElem />
-            </div>
-
+            Room ID : {roomID}
             <div className="">
               <div className="">
-                {peersKeys.map((key) => (
-                  <PeerVideoAudioElem key={`peerId-${key}`} peerIdAtIndex={key} />
+                <MeVideoElem />
+              </div>
 
-                ))}
+              <div className="">
+                <div className="">
+                  {peersKeys.map((key) => (
+                    <PeerVideoAudioElem key={`peerId-${key}`} peerIdAtIndex={key} />
+
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-          <div className="">
-            <button onClick={handleJoin}>Join Room</button>
-            <button onClick={() => huddleClient.enableWebcam()}>
-              Enable Webcam
-            </button>
-            <button onClick={() => huddleClient.disableWebcam()}>
-              Disable Webcam
-            </button>
-            {/* <button onClick={() => huddleClient.allowAllLobbyPeersToJoinRoom()}>
+            <div className="">
+              <button onClick={handleJoin}>Join Room</button>
+              <button onClick={() => huddleClient.enableWebcam()}>
+                Enable Webcam
+              </button>
+              <button onClick={() => huddleClient.disableWebcam()}>
+                Disable Webcam
+              </button>
+              <button onClick={() => huddleClient.allowAllLobbyPeersToJoinRoom()}>
               allowAllLobbyPeersToJoinRoom()
-            </button> */}
-            <button onClick={() => setStatus(false) }>
-              Exit
             </button>
-          </div>
+              <button onClick={() => handleSkip()}>
+                Skip
+              </button>
+            </div>
           </center>
         </HuddleClientProvider>
       </div>
@@ -203,66 +203,77 @@ function App() {
     checkIfWalletIsConnected();
   }, []);
 
-  // useEffect(() =>{
-  //   console.log({peersKeys})
-  // }, [peersKeys])
+  useEffect(() =>{
+    console.log(roomID, '- Room ID Has changed')
+  }, [roomID])
 
   const findMatch = async () => {
 
     const q = query(collection(myDatabase, "Users"), where("status", "==", false), limit(1));
     const querySnapshot = await getDocs(q);
-    if (querySnapshot.size != 0) {
+     console.log(querySnapshot.size)
+    if (querySnapshot.size > 0) {
       querySnapshot.forEach((doc) => {
-        if(doc.id != currentAccount){
+        if (doc.id != currentAccount) {
           setRoomID(doc.id)
           console.log(doc.id, " => ", doc.data().status);
+          console.log("Found Room Match")
+          console.log("Set Status to true")
         }
-        
+        else{
+          createRoom();
+        }
+
       });
 
-      console.log("Found Room Match")
-
-
-      console.log("Set Status to true")
-
-      await updateDoc(doc(myDatabase, "Users", roomID), {
-        status: true
-      });
-
-      setStatus(true)
-      // huddleClient.enableWebcam()
-      handleJoin()
-      huddleClient.allowAllLobbyPeersToJoinRoom()
-      console.log("joined" + roomID)
+      if(roomID != currentAccount){
+        await updateDoc(doc(myDatabase, "Users", roomID), {
+          status: true
+        });
+  
+        setStatus(true)
+        // huddleClient.enableWebcam()
+        handleJoin()
+        huddleClient.allowAllLobbyPeersToJoinRoom()
+        console.log("joined --->" + roomID)
+      }
+      
     }
     else {
       console.log("Not Found")
-
-      await setDoc(doc(myDatabase, "Users", currentAccount), {
-        type: "punk",
-        status: false
-      });
-      
-      setRoomID(currentAccount);
-
-      console.log("Created Room" + roomID)
-
-      console.log("Waiting for Participant")
-
-      const unsub = onSnapshot(doc(myDatabase, "Users", currentAccount), (doc) => {
-        console.log("Current data: ", doc.data());
-        setMessage("waiting for participant to join")
-        if (doc.data().status == true) {
-          setMessage("")
-          setStatus(true)
-           huddleClient.enableWebcam()
-          //  handleJoin()
-            huddleClient.allowAllLobbyPeersToJoinRoom()
-        }
-      });
-
+      createRoom();
     }
   }
+
+  const createRoom = async () => {
+    await setDoc(doc(myDatabase, "Users", currentAccount), {
+      type: "punk",
+      status: false
+    });
+
+    setRoomID(currentAccount);
+
+    console.log("Created Room" + roomID)
+
+    console.log("Waiting for Participant")
+
+    const unsub = onSnapshot(doc(myDatabase, "Users", currentAccount), (doc) => {
+      console.log("Current data: ", doc.data());
+      setMessage("waiting for participant to join")
+      if (doc.data().status == true) {
+        setMessage("")
+        setStatus(true)
+        huddleClient.enableWebcam()
+        //handleJoin()
+        //huddleClient.allowAllLobbyPeersToJoinRoom()
+      }
+    });
+  }
+
+  const handleSkip = async () => {
+    setStatus(false);
+    findMatch();
+  };
 
   const handleJoin = async () => {
     try {
@@ -281,10 +292,10 @@ function App() {
   return (
     <>
       <div>
-      <center>
-        {!currentAccount && renderNotConnectedContainer()}
-        {currentAccount && renderConnectedContainer()}
-      </center>
+        <center>
+          {!currentAccount && renderNotConnectedContainer()}
+          {currentAccount && renderConnectedContainer()}
+        </center>
       </div>
     </>
   );
