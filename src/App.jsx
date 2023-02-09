@@ -11,8 +11,8 @@ function App() {
       <Routes>
         <Route path="/">
           <Route index element={<Home />} />
-          <Route path="meeting" element={<Meeting />} />
-          <Route path="match" element={<Match />} />
+          <Route path="/meeting" caseSensitive={false} element={<Meeting />} />
+          <Route path="/match" caseSensitive={false} element={<Match />} />
         </Route>
       </Routes>
     </BrowserRouter>
