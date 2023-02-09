@@ -127,7 +127,7 @@ export default function Match() {
     useEffect(() => {
         async function joinMatch(){
             console.log("roomID -----> " + roomID)
-            if (roomID != currentAccount && roomID!= null) {
+            if (roomID != currentAccount && roomID!= "") {
                 console.log("I am here")
                 await updateDoc(doc(myDatabase, "Users", roomID), {
                     status: true
@@ -136,28 +136,33 @@ export default function Match() {
                 setStatus(true)
                 huddleClient.enableWebcam()
                 handleJoin()                
-                console.log("joined --->" + roomID)
+                console.log("joined r@@m--->" + roomID)
+            }
+            
+            if(roomID == currentAccount && roomID!= ""){
+                handleJoin()   
+                console.log("joined rOOm --->" + roomID)      
             }
         }
         joinMatch();
     }, [roomID])
 
-    useEffect(() => {
-        async function joinCreatedRoom(){
-            console.log("roomID SECOND WALA  -----> " + roomID)
-            if (roomID == currentAccount && status == true ) {
-                huddleClient.enableWebcam()
-                handleJoin()               
-                console.log("joined --->" + roomID)
-            }
-        }
-        joinCreatedRoom();
-    }, [status])
+    // useEffect(() => {
+    //     async function joinCreatedRoom(){
+    //         console.log("roomID SECOND WALA  -----> " + roomID)
+    //         if (roomID == currentAccount) {
+    //             huddleClient.enableWebcam()
+                     
+                
+    //         }
+    //     }
+    //     joinCreatedRoom();
+    // }, [status])
 
     useEffect(() => {
         huddleClient.allowAllLobbyPeersToJoinRoom();
         console.log("Lobby Peers ARE --------> "+lobbyPeers);
-    }, [lobbyPeers, roomState]);
+    }, [lobbyPeers]);
 
     useEffect(() => {
         console.log("PeersID ARE --------> "+peersKeys);
@@ -229,9 +234,11 @@ export default function Match() {
             await huddleClient.join(roomID, {
                 address: currentAccount,
                 wallet: currentAccount,
+                ens: "ftnikhil.eth"
             });
             console.log("joined --------> " + roomID);
         } catch (error) {
+            console.log("got error --------> ")
             console.log({ error });
         }
     };
@@ -241,7 +248,7 @@ export default function Match() {
     const renderNotConnectedContainer = () => (<>
         <center>
             <div className="text-6xl pt-32">
-                <button onClick={connectWallet} className="rounded-lg bg-yellow-400 hover:opacity-75 p-8">
+                <button onClick={connectWallet} className="text-white bg-purple-700 hover:bg-violet-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                     Connect Wallet
                 </button>
             </div>
@@ -340,8 +347,8 @@ export default function Match() {
                             </div>
                         </figure>
                         <div className="">
-                            {/* <button onClick={handleJoin}>Join Room</button> */}
-                            {/* <button onClick={() => huddleClient.allowAllLobbyPeersToJoinRoom()}>
+                            {/* <button onClick={handleJoin}>Join Room</button>
+                            <button onClick={() => huddleClient.allowAllLobbyPeersToJoinRoom()}>
                                 allowAllLobbyPeersToJoinRoom
                             </button> */}
                         </div>
@@ -358,7 +365,7 @@ export default function Match() {
                     <div className="text-6xl pt-32">
                         <h2>Please switch to Polygon Mumbai Testnet</h2>
                         <br />
-                        <button className='rounded-lg bg-yellow-400 hover:opacity-75 p-8' onClick={switchNetwork}>Click here to switch</button>
+                        <button className='text-white bg-purple-700 hover:bg-violet-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800' onClick={switchNetwork}>Click here to switch</button>
                     </div>
                 </center>
             </>
