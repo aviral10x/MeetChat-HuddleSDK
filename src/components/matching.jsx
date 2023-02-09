@@ -14,6 +14,7 @@ import {
 import { useHuddleStore } from "@huddle01/huddle01-client/store";
 import PeerVideoAudioElem from "./PeerVideoAudioElem";
 import MeVideoElem from "./MeVideoElem";
+import { async } from "@firebase/util";
 
 export default function Match() {
     const [videoIcon, setVideoIcon] = useState(true)
@@ -124,10 +125,43 @@ export default function Match() {
     }, []);
 
     useEffect(() => {
-        console.log(roomID, '- Room ID Has changed')
+        async function joinMatch(){
+            console.log("roomID -----> " + roomID)
+            if (roomID != currentAccount && roomID!= null) {
+                console.log("I am here")
+                await updateDoc(doc(myDatabase, "Users", roomID), {
+                    status: true
+                });
+
+                setStatus(true)
+                huddleClient.enableWebcam()
+                handleJoin()                
+                console.log("joined --->" + roomID)
+            }
+        }
+        joinMatch();
     }, [roomID])
 
+    useEffect(() => {
+        async function joinCreatedRoom(){
+            console.log("roomID SECOND WALA  -----> " + roomID)
+            if (roomID == currentAccount && status == true ) {
+                huddleClient.enableWebcam()
+                handleJoin()               
+                console.log("joined --->" + roomID)
+            }
+        }
+        joinCreatedRoom();
+    }, [status])
 
+    useEffect(() => {
+        huddleClient.allowAllLobbyPeersToJoinRoom();
+        console.log("Lobby Peers ARE --------> "+lobbyPeers);
+    }, [lobbyPeers, roomState]);
+
+    useEffect(() => {
+        console.log("PeersID ARE --------> "+peersKeys);
+    }, [peersKeys]);
 
 
     const findMatch = async () => {
@@ -138,28 +172,14 @@ export default function Match() {
         if (querySnapshot.size > 0) {
             querySnapshot.forEach((doc) => {
                 if (doc.id != currentAccount) {
-                    setRoomID(()=> {return doc.id})
+                    setRoomID(doc.id)
                     console.log(doc.id, " => ", doc.data().status);
                     console.log("Found Room Match")
                 }
                 else {
                     createRoom();
                 }
-
-            });
-            console.log("roomID -----> " + roomID)
-            if (roomID != currentAccount) {
-                await updateDoc(doc(myDatabase, "Users", roomID), {
-                    status: true
-                });
-
-                setStatus(true)
-                huddleClient.enableWebcam()
-                handleJoin()
-                huddleClient.allowAllLobbyPeersToJoinRoom()
-                console.log("joined --->" + roomID)
-            }
-
+            });           
         }
         else {
             console.log("Not Found")
@@ -185,8 +205,6 @@ export default function Match() {
             if (doc.data().status == true) {
                 setMessage("")
                 setStatus(true)
-                huddleClient.enableWebcam()
-                //handleJoin(); 
             }
         });
     }
@@ -212,7 +230,6 @@ export default function Match() {
                 address: currentAccount,
                 wallet: currentAccount,
             });
-            await huddleClient.allowAllLobbyPeersToJoinRoom();
             console.log("joined --------> " + roomID);
         } catch (error) {
             console.log({ error });
@@ -323,10 +340,10 @@ export default function Match() {
                             </div>
                         </figure>
                         <div className="">
-                            <button onClick={handleJoin}>Join Room</button>
-                            <button onClick={() => huddleClient.allowAllLobbyPeersToJoinRoom()}>
+                            {/* <button onClick={handleJoin}>Join Room</button> */}
+                            {/* <button onClick={() => huddleClient.allowAllLobbyPeersToJoinRoom()}>
                                 allowAllLobbyPeersToJoinRoom
-                            </button>
+                            </button> */}
                         </div>
                     </div>
                 </HuddleClientProvider>
