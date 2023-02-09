@@ -12,6 +12,12 @@ import { useHuddleStore } from "@huddle01/huddle01-client/store";
 import PeerVideoAudioElem from "./components/PeerVideoAudioElem";
 import MeVideoElem from "./components/MeVideoElem";
 
+import Head from 'next/head'
+import Image from 'next/image'
+import Header from '../components/header'
+import Hero from '../components/hero'
+
+
 function App() {
   const huddleClient = getHuddleClient("6cf466614f891d0d82f5ad03c58924894ee37accbea11efc08f63bdd0d30dfc9");
   const peersKeys = useHuddleStore((state) => Object.keys(state.peers));
@@ -292,6 +298,30 @@ function App() {
   return (
     <>
       <div>
+      <div >
+      <Header />
+      <Hero />
+      <Head>
+        <title>Meet3Club</title>
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+
+
+
+    
+
+      <footer className="flex h-15 w-full items-center justify-center">
+        <a
+          className="flex items-center justify-center gap-2"
+          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Powered by <b>Meet3Club</b>
+        
+        </a>
+      </footer>
+    </div>
         <center>
           {!currentAccount && renderNotConnectedContainer()}
           {currentAccount && renderConnectedContainer()}
