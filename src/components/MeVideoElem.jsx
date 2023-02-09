@@ -15,7 +15,7 @@ const MeVideoElem = () => {
   }, [stream]);
   return (
     <video
-      style={{ width: "50%" }}
+      style={{ width: "100%", height: "50vh", objectFit: 'cover' }}
       ref={videoRef}
       autoPlay
       muted

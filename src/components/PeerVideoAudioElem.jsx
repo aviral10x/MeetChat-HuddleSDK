@@ -56,13 +56,14 @@ const PeerVideoAudioElem = ({ peerIdAtIndex }) => {
   }, [peerMicTrack]);
 
   return (
-    <div style={{ width: "50%" }}>
+    <div >
       <video
         ref={videoRef}
+        style={{ width: "100%", height: "50vh", objectFit: 'cover' }}
         muted
         autoPlay
         playsInline
-        style={{ width: "100%" }}
+        
       />
       <audio ref={audioRef} autoPlay playsInline controls={false}></audio>
     </div>
