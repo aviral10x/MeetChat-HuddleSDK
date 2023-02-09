@@ -7,13 +7,10 @@ import Meeting from './meeting'
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-          <Route index element={<Home />} />
-          <Route path="/meeting" caseSensitive={false} element={<Meeting />} />
-          <Route path="/match" caseSensitive={false} element={<Match />} />
-      </Routes>
-    </BrowserRouter>
+
+        <Home />
+   
+   
   );
 }
 

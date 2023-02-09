@@ -279,10 +279,10 @@ export default function Match() {
                         <figure className="flex flex-col items-center justify-center  p-5 m-5">
 
                             <div className="max-w-l ">
-                                <div>
+                                /* <div>
                                     <h5 className=" mb-1 text-3xl font-bold tracking-tight text-white dark:text-white">Your Match</h5>
                                     {/* Room ID : {roomID} */}
-                                </div>
+                                </div> */
 
                                 <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-1 sm:gap-16 lg:grid-cols-2">
 
